@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gleam – Children's Care & Support Services</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-darkest:#0d3d2e; --green-dark:#1a5c40; --green-main:#2a7a52;
+    --green-mid:#3d9e6a; --green-light:#5cbf85; --green-pale:#e8f5ee;
+    --green-ghost:#f3faf6; --white:#ffffff; --off-white:#fafafa;
+    --text-dark:#111c17; --text-mid:#3a4a42; --text-muted:#7a9088;
+    --border:#d4e8dc; --error:#e53e3e; --success:#2a7a52;
+    --shadow-sm:0 2px 8px rgba(26,92,64,.08);
+    --shadow-md:0 6px 24px rgba(26,92,64,.12);
+    --shadow-lg:0 16px 48px rgba(26,92,64,.18);
+    --radius-sm:10px; --radius-md:16px; --radius-lg:24px; --radius-xl:36px;
+    --transition:all .25s cubic-bezier(.4,0,.2,1);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text-dark);line-height:1.6;overflow-x:hidden}
+  a{text-decoration:none;color:inherit} img{display:block;max-width:100%}
+  button{cursor:pointer;font-family:inherit;border:none;outline:none} ul{list-style:none}
+
+  /* ── NAVBAR ── */
+  .navbar{position:fixed;top:0;left:0;right:0;z-index:999;background:rgba(255,255,255,.92);
+    backdrop-filter:blur(12px);border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 5%;height:68px;transition:var(--transition)}
+  .navbar.scrolled{box-shadow:var(--shadow-md)}
+  .nav-logo{display:flex;align-items:center;gap:10px;font-family:'DM Serif Display',serif;
+    font-size:1.6rem;color:var(--green-dark)}
+  .nav-logo .paw{width:38px;height:38px;background:var(--green-pale);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+  .nav-links{display:flex;align-items:center;gap:36px}
+  .nav-links a{font-size:.92rem;font-weight:500;color:var(--text-mid);padding-bottom:4px;
+    position:relative;transition:var(--transition)}
+  .nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;
+    background:var(--green-main);transition:var(--transition)}
+  .nav-links a:hover,.nav-links a.active{color:var(--green-main)}
+  .nav-links a:hover::after,.nav-links a.active::after{width:100%}
+  .nav-actions{display:flex;align-items:center;gap:12px}
+  #nav-user-area{display:flex;align-items:center;gap:12px}
+  .btn-outline{padding:9px 24px;border-radius:50px;border:1.5px solid var(--green-dark);
+    color:var(--green-dark);font-size:.9rem;font-weight:600;background:transparent;transition:var(--transition)}
+  .btn-outline:hover{background:var(--green-dark);color:var(--white)}
+  .btn-solid{padding:9px 24px;border-radius:50px;background:var(--green-dark);color:var(--white);
+    font-size:.9rem;font-weight:600;transition:var(--transition)}
+  .btn-solid:hover{background:var(--green-darkest);transform:translateY(-1px)}
+  .user-chip{display:flex;align-items:center;gap:8px;padding:6px 16px;border-radius:50px;
+    background:var(--green-pale);color:var(--green-dark);font-size:.85rem;font-weight:600}
+  .user-chip .dot{width:8px;height:8px;border-radius:50%;background:var(--green-main)}
+
+  /* ── HERO ── */
+  .hero{min-height:100vh;background:linear-gradient(145deg,var(--green-ghost) 0%,var(--white) 60%);
+    display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:60px;
+    padding:100px 8% 80px;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;top:-120px;right:-120px;width:550px;height:550px;
+    border-radius:50%;background:radial-gradient(circle,rgba(93,191,133,.15) 0%,transparent 70%);pointer-events:none}
+  .hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--green-pale);
+    color:var(--green-dark);padding:6px 16px;border-radius:50px;font-size:.82rem;font-weight:600;
+    margin-bottom:22px;letter-spacing:.03em}
+  .hero-badge span{width:6px;height:6px;border-radius:50%;background:var(--green-main)}
+  .hero-title{font-family:'DM Serif Display',serif;font-size:clamp(2.4rem,4vw,3.8rem);
+    line-height:1.12;color:var(--text-dark);margin-bottom:20px}
+  .hero-title em{color:var(--green-main);font-style:normal}
+  .hero-desc{font-size:1.05rem;color:var(--text-mid);max-width:480px;margin-bottom:36px;line-height:1.7}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+  .btn-hero-primary{padding:14px 36px;border-radius:50px;background:var(--green-dark);color:var(--white);
+    font-size:1rem;font-weight:600;box-shadow:0 8px 24px rgba(26,92,64,.3);transition:var(--transition)}
+  .btn-hero-primary:hover{background:var(--green-darkest);transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+  .btn-hero-secondary{padding:14px 36px;border-radius:50px;border:1.5px solid var(--green-dark);
+    color:var(--green-dark);font-size:1rem;font-weight:600;background:transparent;transition:var(--transition)}
+  .btn-hero-secondary:hover{background:var(--green-pale)}
+  .hero-stats{display:flex;gap:32px;margin-top:48px;padding-top:32px;border-top:1px solid var(--border)}
+  .stat-num{font-family:'DM Serif Display',serif;font-size:2rem;color:var(--green-dark)}
+  .stat-label{font-size:.82rem;color:var(--text-muted);font-weight:500}
+  .hero-visual{display:grid;grid-template-columns:1fr 1fr;gap:16px;animation:floatUp .8s ease both}
+  @keyframes floatUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+  .hero-card{background:var(--white);border-radius:var(--radius-md);padding:24px;
+    box-shadow:var(--shadow-md);border:1px solid var(--border);transition:var(--transition)}
+  .hero-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+  .hero-card.featured{grid-column:span 2;background:var(--green-dark);color:var(--white)}
+  .hero-card .icon{width:48px;height:48px;border-radius:var(--radius-sm);background:var(--green-pale);
+    display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:12px}
+  .hero-card.featured .icon{background:rgba(255,255,255,.15)}
+  .hero-card h4{font-size:.95rem;font-weight:700;margin-bottom:4px}
+  .hero-card p{font-size:.82rem;color:var(--text-muted)}
+  .hero-card.featured p{color:rgba(255,255,255,.7)}
+  .hero-card.featured h4{color:var(--white)}
+  .stars{color:#f5c842;letter-spacing:1px}
+
+  /* ── SECTIONS ── */
+  section{padding:90px 8%}
+  .section-label{display:inline-flex;align-items:center;gap:8px;background:var(--green-pale);
+    color:var(--green-dark);padding:5px 14px;border-radius:50px;font-size:.78rem;font-weight:700;
+    letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px}
+  .section-title{font-family:'DM Serif Display',serif;font-size:clamp(1.8rem,3vw,2.6rem);
+    line-height:1.2;color:var(--text-dark);margin-bottom:14px}
+  .section-desc{font-size:1rem;color:var(--text-muted);max-width:540px;line-height:1.7}
+  .section-header{margin-bottom:52px}
+  .section-header.centered{text-align:center}
+  .section-header.centered .section-desc{margin:0 auto}
+
+  /* ── SERVICES ── */
+  .services{background:var(--off-white)}
+  .services-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+  .service-card{background:var(--white);border-radius:var(--radius-lg);padding:36px 28px;
+    text-align:center;border:1px solid var(--border);box-shadow:var(--shadow-sm);
+    cursor:pointer;transition:var(--transition);position:relative;overflow:hidden}
+  .service-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg);border-color:var(--green-light)}
+  .service-icon{width:72px;height:72px;border-radius:var(--radius-md);background:var(--green-pale);
+    margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:2rem;transition:var(--transition)}
+  .service-card:hover .service-icon{background:var(--green-dark)}
+  .service-card h3{font-size:1.15rem;font-weight:700;color:var(--text-dark);margin-bottom:8px}
+  .service-card p{font-size:.88rem;color:var(--text-muted);line-height:1.6}
+  .service-link{display:inline-flex;align-items:center;gap:6px;margin-top:18px;
+    color:var(--green-main);font-size:.88rem;font-weight:600;transition:var(--transition)}
+  .service-card:hover .service-link{gap:10px}
+
+  /* ── HOW IT WORKS ── */
+  .how-it-works{background:var(--green-dark);color:var(--white)}
+  .how-it-works .section-title{color:var(--white)}
+  .how-it-works .section-desc{color:rgba(255,255,255,.65);max-width:560px}
+  .how-it-works .section-label{background:rgba(255,255,255,.12);color:var(--white)}
+  .steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;margin-top:52px;position:relative}
+  .steps-grid::before{content:'';position:absolute;top:36px;left:10%;right:10%;height:1px;
+    background:rgba(255,255,255,.15);z-index:0}
+  .step{text-align:center;position:relative;z-index:1}
+  .step-num{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.12);
+    border:2px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;
+    margin:0 auto 20px;font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--white);transition:var(--transition)}
+  .step:hover .step-num{background:var(--green-light);border-color:var(--green-light);color:var(--green-darkest)}
+  .step h4{font-size:1rem;font-weight:700;margin-bottom:8px;color:var(--white)}
+  .step p{font-size:.85rem;color:rgba(255,255,255,.6);line-height:1.6}
+
+  /* ── PROVIDERS ── */
+  .providers-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+  .provider-card{background:var(--white);border-radius:var(--radius-lg);padding:32px 28px;
+    border:1px solid var(--border);box-shadow:var(--shadow-sm);transition:var(--transition);
+    display:flex;flex-direction:column;gap:16px}
+  .provider-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg);border-color:var(--green-light)}
+  .provider-top{display:flex;align-items:center;gap:14px}
+  .provider-avatar{width:56px;height:56px;border-radius:50%;
+    background:linear-gradient(135deg,var(--green-main),var(--green-darkest));
+    display:flex;align-items:center;justify-content:center;color:var(--white);
+    font-family:'DM Serif Display',serif;font-size:1.4rem;flex-shrink:0;overflow:hidden}
+  .provider-avatar img{width:100%;height:100%;object-fit:cover}
+  .provider-info h4{font-size:1rem;font-weight:700;color:var(--text-dark)}
+  .provider-info .role{font-size:.8rem;color:var(--green-main);font-weight:600}
+  .provider-rating{display:flex;align-items:center;gap:6px}
+  .provider-rating span{font-size:.82rem;color:var(--text-muted)}
+  .provider-tags{display:flex;flex-wrap:wrap;gap:8px}
+  .tag{padding:4px 12px;border-radius:50px;background:var(--green-pale);color:var(--green-dark);
+    font-size:.75rem;font-weight:600}
+  .provider-price{display:flex;align-items:center;justify-content:space-between;
+    padding-top:14px;border-top:1px solid var(--border)}
+  .price{font-family:'DM Serif Display',serif;font-size:1.3rem;color:var(--green-dark)}
+  .price span{font-size:.75rem;font-family:'DM Sans',sans-serif;color:var(--text-muted)}
+  .btn-book{padding:9px 22px;border-radius:50px;background:var(--green-dark);color:var(--white);
+    font-size:.85rem;font-weight:600;transition:var(--transition)}
+  .btn-book:hover{background:var(--green-darkest)}
+  .loading-row{text-align:center;padding:40px;color:var(--text-muted);font-size:.9rem}
+  .spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border);
+    border-top-color:var(--green-main);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ── DASHBOARD ── */
+  .dashboard-section{background:var(--green-ghost);display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:80px}
+  .feature-list{display:flex;flex-direction:column;gap:16px;margin-top:28px}
+  .feature-item{display:flex;align-items:flex-start;gap:14px}
+  .feature-icon{width:40px;height:40px;border-radius:var(--radius-sm);flex-shrink:0;
+    background:var(--green-pale);display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+  .feature-item h5{font-size:.95rem;font-weight:700;margin-bottom:3px}
+  .feature-item p{font-size:.85rem;color:var(--text-muted)}
+  .dashboard-mockup{background:var(--white);border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-lg);padding:28px;border:1px solid var(--border)}
+  .mockup-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+  .mockup-header h3{font-size:1.1rem;font-weight:700;color:var(--text-dark)}
+  .mockup-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .mockup-stat{background:var(--green-ghost);border-radius:var(--radius-md);
+    padding:20px;text-align:center;border:1px solid var(--border)}
+  .mockup-stat .m-icon{font-size:1.6rem;margin-bottom:8px}
+  .mockup-stat .m-val{font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--green-dark)}
+  .mockup-stat .m-label{font-size:.75rem;color:var(--text-muted);font-weight:600;margin-top:2px}
+  .mockup-actions{display:flex;gap:10px;margin-top:18px}
+  .mockup-btn{flex:1;padding:10px;border-radius:var(--radius-sm);background:var(--green-dark);
+    color:var(--white);font-size:.78rem;font-weight:600;text-align:center;transition:var(--transition);cursor:pointer}
+  .mockup-btn:hover{background:var(--green-darkest)}
+
+  /* ── REPORTS ── */
+  .reports-section{background:var(--off-white)}
+  .reports-content{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+  .report-mockup{background:var(--white);border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-lg);overflow:hidden;border:1px solid var(--border)}
+  .report-mockup-header{background:var(--green-dark);color:var(--white);
+    padding:20px 24px;display:flex;align-items:center;justify-content:space-between}
+  .report-mockup-header h4{font-size:1rem;font-weight:700}
+  .report-mockup-body{padding:24px}
+  .report-types{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+  .report-type-item{padding:12px 16px;border-radius:var(--radius-sm);border:1.5px solid var(--border);
+    cursor:pointer;transition:var(--transition);display:flex;align-items:center;gap:10px}
+  .report-type-item.active{border-color:var(--green-main);background:var(--green-pale)}
+  .report-type-item .rt-icon{width:32px;height:32px;border-radius:8px;background:var(--green-pale);
+    display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+  .report-type-item.active .rt-icon{background:var(--green-main)}
+  .report-type-item h5{font-size:.88rem;font-weight:700}
+  .report-type-item p{font-size:.75rem;color:var(--text-muted)}
+  .recipients{display:flex;flex-wrap:wrap;gap:8px}
+  .recipient-tag{padding:5px 14px;border-radius:50px;background:var(--green-dark);
+    color:var(--white);font-size:.75rem;font-weight:600}
+  .send-btn-wrap{margin-top:18px}
+  .send-btn{width:100%;padding:13px;border-radius:var(--radius-sm);background:var(--green-dark);
+    color:var(--white);font-size:.9rem;font-weight:700;transition:var(--transition)}
+  .send-btn:hover{background:var(--green-darkest)}
+
+  /* ── TESTIMONIALS ── */
+  .testimonials{background:var(--white)}
+  .testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:52px}
+  .testimonial-card{background:var(--green-ghost);border-radius:var(--radius-lg);
+    padding:32px 28px;border:1px solid var(--border);transition:var(--transition)}
+  .testimonial-card:hover{box-shadow:var(--shadow-md);transform:translateY(-3px)}
+  .t-stars{color:#f5c842;font-size:1rem;margin-bottom:14px;letter-spacing:2px}
+  .t-text{font-size:.92rem;color:var(--text-mid);line-height:1.7;margin-bottom:20px;font-style:italic}
+  .t-author{display:flex;align-items:center;gap:12px}
+  .t-avatar{width:40px;height:40px;border-radius:50%;
+    background:linear-gradient(135deg,var(--green-main),var(--green-dark));
+    display:flex;align-items:center;justify-content:center;color:var(--white);font-weight:700;font-size:.9rem;flex-shrink:0}
+  .t-author h5{font-size:.88rem;font-weight:700;color:var(--text-dark)}
+  .t-author p{font-size:.78rem;color:var(--text-muted)}
+
+  /* ── SUBS ── */
+  .subscriptions-section{background:var(--off-white)}
+  .sub-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:52px}
+  .sub-card{background:var(--white);border-radius:var(--radius-lg);padding:40px 32px;
+    border:1.5px solid var(--border);transition:var(--transition);position:relative;overflow:hidden}
+  .sub-card.featured{background:var(--green-dark);color:var(--white);border-color:var(--green-dark);
+    transform:scale(1.04);box-shadow:var(--shadow-lg)}
+  .sub-card:hover:not(.featured){border-color:var(--green-light);box-shadow:var(--shadow-md)}
+  .sub-badge{position:absolute;top:16px;right:16px;background:var(--green-light);
+    color:var(--green-darkest);padding:3px 12px;border-radius:50px;font-size:.72rem;font-weight:700;letter-spacing:.05em}
+  .sub-name{font-size:.85rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--green-main);margin-bottom:10px}
+  .sub-card.featured .sub-name{color:rgba(255,255,255,.7)}
+  .sub-price{font-family:'DM Serif Display',serif;font-size:2.6rem;margin-bottom:4px}
+  .sub-price span{font-size:.9rem;font-family:'DM Sans',sans-serif;color:var(--text-muted)}
+  .sub-card.featured .sub-price span{color:rgba(255,255,255,.6)}
+  .sub-desc{font-size:.85rem;color:var(--text-muted);margin-bottom:28px}
+  .sub-card.featured .sub-desc{color:rgba(255,255,255,.6)}
+  .sub-features{display:flex;flex-direction:column;gap:10px;margin-bottom:32px}
+  .sub-feature{display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--text-mid)}
+  .sub-card.featured .sub-feature{color:rgba(255,255,255,.85)}
+  .sub-feature .check{color:var(--green-main);font-size:1rem}
+  .sub-card.featured .sub-feature .check{color:var(--green-light)}
+  .sub-btn{width:100%;padding:13px;border-radius:50px;background:var(--green-pale);
+    color:var(--green-dark);font-size:.9rem;font-weight:700;transition:var(--transition)}
+  .sub-card.featured .sub-btn{background:var(--white);color:var(--green-dark)}
+  .sub-btn:hover{background:var(--green-mid);color:var(--white)}
+
+  /* ── CTA ── */
+  .cta-banner{background:linear-gradient(135deg,var(--green-darkest) 0%,var(--green-main) 100%);
+    padding:80px 8%;text-align:center;color:var(--white);position:relative;overflow:hidden}
+  .cta-banner h2{font-family:'DM Serif Display',serif;font-size:clamp(1.8rem,3vw,2.8rem);margin-bottom:14px}
+  .cta-banner p{font-size:1rem;color:rgba(255,255,255,.72);max-width:480px;margin:0 auto 36px}
+  .cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .btn-cta-white{padding:14px 40px;border-radius:50px;background:var(--white);color:var(--green-dark);
+    font-size:1rem;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.15);transition:var(--transition)}
+  .btn-cta-white:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,.25)}
+  .btn-cta-outline{padding:14px 40px;border-radius:50px;border:1.5px solid rgba(255,255,255,.5);
+    color:var(--white);font-size:1rem;font-weight:700;background:transparent;transition:var(--transition)}
+  .btn-cta-outline:hover{background:rgba(255,255,255,.1);border-color:var(--white)}
+
+  /* ── FOOTER ── */
+  footer{background:var(--text-dark);color:var(--white);padding:70px 8% 32px}
+  .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:52px}
+  .footer-brand .nav-logo{color:var(--white);margin-bottom:14px}
+  .footer-brand .nav-logo .paw{background:rgba(255,255,255,.1)}
+  .footer-brand p{font-size:.88rem;color:rgba(255,255,255,.55);line-height:1.7;max-width:280px}
+  .footer-col h5{font-size:.9rem;font-weight:700;margin-bottom:18px;color:var(--white)}
+  .footer-col ul{display:flex;flex-direction:column;gap:10px}
+  .footer-col li a{font-size:.85rem;color:rgba(255,255,255,.5);transition:var(--transition)}
+  .footer-col li a:hover{color:var(--green-light)}
+  .footer-bottom{padding-top:28px;border-top:1px solid rgba(255,255,255,.08);
+    display:flex;align-items:center;justify-content:space-between;font-size:.82rem;color:rgba(255,255,255,.35)}
+
+  /* ── MODAL ── */
+  .modal-overlay{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);
+    backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px}
+  .modal-overlay.open{display:flex;animation:fadeIn .2s ease}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .modal{background:var(--white);border-radius:var(--radius-xl);padding:48px 42px;
+    max-width:480px;width:100%;box-shadow:var(--shadow-lg);position:relative;
+    animation:slideUp .3s ease;max-height:90vh;overflow-y:auto}
+  @keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+  .modal-close{position:absolute;top:20px;right:20px;width:36px;height:36px;border-radius:50%;
+    background:var(--green-ghost);display:flex;align-items:center;justify-content:center;
+    font-size:1.1rem;color:var(--text-mid);cursor:pointer;transition:var(--transition)}
+  .modal-close:hover{background:var(--green-pale);color:var(--green-dark)}
+  .modal h2{font-family:'DM Serif Display',serif;font-size:1.8rem;text-align:center;margin-bottom:6px}
+  .modal .sub-text{text-align:center;color:var(--text-muted);font-size:.9rem;margin-bottom:28px}
+  .form-group{margin-bottom:18px}
+  .form-group label{display:block;font-size:.85rem;font-weight:600;color:var(--text-mid);margin-bottom:6px}
+  .form-group input,.form-group select{width:100%;padding:12px 16px;border-radius:var(--radius-sm);
+    border:1.5px solid var(--border);font-size:.92rem;font-family:inherit;background:var(--white);
+    color:var(--text-dark);transition:var(--transition);outline:none}
+  .form-group input:focus,.form-group select:focus{border-color:var(--green-main);box-shadow:0 0 0 3px rgba(42,122,82,.1)}
+  .form-check{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+  .form-check input[type=checkbox]{accent-color:var(--green-dark);width:16px;height:16px}
+  .form-check label{font-size:.85rem;color:var(--text-muted)}
+  .form-check a{color:var(--green-main);font-weight:600}
+  .btn-submit{width:100%;padding:14px;border-radius:50px;background:var(--green-dark);
+    color:var(--white);font-size:1rem;font-weight:700;transition:var(--transition)}
+  .btn-submit:hover{background:var(--green-darkest)}
+  .btn-submit:disabled{background:var(--border);cursor:not-allowed}
+  .or-divider{text-align:center;color:var(--text-muted);font-size:.82rem;margin:16px 0;position:relative}
+  .or-divider::before,.or-divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--border)}
+  .or-divider::before{left:0} .or-divider::after{right:0}
+  .alert{padding:12px 16px;border-radius:var(--radius-sm);font-size:.88rem;font-weight:500;
+    margin-bottom:16px;display:none}
+  .alert.error{background:#fff5f5;color:var(--error);border:1px solid #fed7d7;display:block}
+  .alert.success{background:var(--green-pale);color:var(--success);border:1px solid var(--border);display:block}
+  .modal-step{display:none}
+  .modal-step.active{display:block}
+  .job-list{display:flex;flex-direction:column;gap:12px;margin:20px 0}
+  .job-item{padding:16px 20px;border-radius:var(--radius-md);border:1.5px solid var(--border);
+    cursor:pointer;display:flex;align-items:center;gap:14px;transition:var(--transition)}
+  .job-item:hover{border-color:var(--green-main);background:var(--green-ghost)}
+  .job-item.selected{border-color:var(--green-dark);background:var(--green-pale)}
+  .job-item .j-icon{width:44px;height:44px;border-radius:var(--radius-sm);background:var(--green-pale);
+    display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+  .job-item.selected .j-icon{background:var(--green-dark)}
+  .job-item h4{font-size:.95rem;font-weight:700;color:var(--green-dark)}
+  .job-item p{font-size:.8rem;color:var(--text-muted)}
+
+  /* ── REVEAL ── */
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.visible{opacity:1;transform:none}
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:1100px){.services-grid{grid-template-columns:repeat(2,1fr)}.providers-grid{grid-template-columns:repeat(2,1fr)}.footer-grid{grid-template-columns:1fr 1fr;gap:36px}}
+  @media(max-width:900px){.hero{grid-template-columns:1fr;padding:100px 6% 60px}.dashboard-section,.reports-content{grid-template-columns:1fr;gap:40px}.steps-grid{grid-template-columns:repeat(2,1fr)}.testimonials-grid,.sub-cards{grid-template-columns:1fr}.sub-card.featured{transform:none}.nav-links{display:none}}
+  @media(max-width:600px){section{padding:60px 5%}.services-grid,.providers-grid,.mockup-grid{grid-template-columns:1fr}.hero-stats{flex-wrap:wrap;gap:20px}.footer-grid{grid-template-columns:1fr}.footer-bottom{flex-direction:column;gap:10px;text-align:center}}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <a href="#" class="nav-logo"><div class="paw">🐾</div>Gleam</a>
+  <ul class="nav-links">
+    <li><a href="#home" class="active">Home</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#providers">Providers</a></li>
+    <li><a href="#reports">Reports</a></li>
+    <li><a href="#subscriptions">Subscriptions</a></li>
+  </ul>
+  <div class="nav-actions">
+    <div id="nav-user-area">
+      <button class="btn-outline" onclick="openModal('login')">Login</button>
+      <button class="btn-solid"  onclick="openModal('signup')">Sign Up</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-content">
+    <div class="hero-badge"><span></span>Egypt's #1 Children Care Platform</div>
+    <h1 class="hero-title">Expert Care for<br><em>Every Child's</em><br>Journey</h1>
+    <p class="hero-desc">Connect with verified doctors, nurses, specialized teachers, and coaches who understand your child's unique needs.</p>
+    <div class="hero-cta">
+      <button class="btn-hero-primary" onclick="openModal('signup')">Get Started Free</button>
+      <button class="btn-hero-secondary" onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">Explore Services</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item"><div class="stat-num">2,400+</div><div class="stat-label">Verified Providers</div></div>
+      <div class="stat-item"><div class="stat-num">18K+</div><div class="stat-label">Families Served</div></div>
+      <div class="stat-item"><div class="stat-num">4.9★</div><div class="stat-label">Average Rating</div></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-card featured">
+      <div class="icon">📊</div>
+      <h4>Service Provider Dashboard</h4>
+      <p>Track clients, earnings, reports & subscriptions in one place.</p>
+    </div>
+    <div class="hero-card"><div class="icon">👨‍⚕️</div><h4>Doctors</h4><p>Pediatric & specialist doctors</p></div>
+    <div class="hero-card"><div class="icon">👩‍🏫</div><h4>Teachers</h4><p>Special needs & shadow teachers</p></div>
+    <div class="hero-card"><div class="icon">💉</div><h4>Nurses</h4><p>Home care & vaccination nurses</p></div>
+    <div class="hero-card"><div class="icon">⚽</div><h4>Coaches</h4><p>Sports & special needs coaches</p></div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+  <div class="section-header centered reveal">
+    <div class="section-label">What We Offer</div>
+    <h2 class="section-title">Specialized Services<br>Tailored for Children</h2>
+    <p class="section-desc">Every service is designed around your child's unique developmental journey.</p>
+  </div>
+  <div class="services-grid">
+    <div class="service-card reveal" onclick="filterProviders('doctor')">
+      <div class="service-icon">👨‍⚕️</div><h3>Doctor</h3>
+      <p>Pediatric doctors & specialists. Clinic, home visits & online consultations.</p>
+      <div class="service-link">Browse Doctors →</div>
+    </div>
+    <div class="service-card reveal" onclick="filterProviders('nurse')">
+      <div class="service-icon">💉</div><h3>Nurse</h3>
+      <p>Vaccination & home child care nurses with full certification.</p>
+      <div class="service-link">Browse Nurses →</div>
+    </div>
+    <div class="service-card reveal" onclick="filterProviders('teacher')">
+      <div class="service-icon">📚</div><h3>Teacher</h3>
+      <p>Learning support & special needs teachers — shadow & behavioral.</p>
+      <div class="service-link">Browse Teachers →</div>
+    </div>
+    <div class="service-card reveal" onclick="filterProviders('coach')">
+      <div class="service-icon">⚽</div><h3>Coach</h3>
+      <p>Kids sports & special needs coaches for a range of activities.</p>
+      <div class="service-link">Browse Coaches →</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-it-works">
+  <div class="section-header centered">
+    <div class="section-label">Simple Process</div>
+    <h2 class="section-title">Get Started in Minutes</h2>
+    <p class="section-desc">Smooth, verified onboarding connects families with the right professionals fast.</p>
+  </div>
+  <div class="steps-grid">
+    <div class="step"><div class="step-num">1</div><h4>Create Account</h4><p>Sign up with email. Choose your role as provider or parent.</p></div>
+    <div class="step"><div class="step-num">2</div><h4>Complete Profile</h4><p>Fill in your specialization, credentials, availability & pricing.</p></div>
+    <div class="step"><div class="step-num">3</div><h4>Get Verified</h4><p>Upload your license and ID for quick verification.</p></div>
+    <div class="step"><div class="step-num">4</div><h4>Start Serving</h4><p>Accept subscriptions, send reports, grow your client base.</p></div>
+  </div>
+</section>
+
+<!-- PROVIDERS -->
+<section id="providers" style="background:var(--off-white);padding:90px 8%">
+  <div class="section-header reveal">
+    <div class="section-label">Our Providers</div>
+    <h2 class="section-title">Meet Our Top-Rated<br>Professionals</h2>
+    <p class="section-desc">All providers are verified, background-checked, and rated by real families.</p>
+  </div>
+  <div class="providers-grid" id="providers-grid">
+    <div class="loading-row" style="grid-column:span 3"><span class="spinner"></span>Loading providers…</div>
+  </div>
+</section>
+
+<!-- DASHBOARD PREVIEW -->
+<section class="dashboard-section">
+  <div class="reveal">
+    <div class="section-label">Provider Dashboard</div>
+    <h2 class="section-title">Everything You Need<br>in One Place</h2>
+    <p class="section-desc">Full visibility into your business — clients, earnings, reports & subscriptions at a glance.</p>
+    <div class="feature-list">
+      <div class="feature-item"><div class="feature-icon">👥</div><div><h5>Client Management</h5><p>View all active clients and subscription status in real-time.</p></div></div>
+      <div class="feature-item"><div class="feature-icon">💰</div><div><h5>Earnings Tracking</h5><p>Monitor monthly income and subscription renewals effortlessly.</p></div></div>
+      <div class="feature-item"><div class="feature-icon">📋</div><div><h5>Report Management</h5><p>Send health, educational & behavioral reports to families.</p></div></div>
+    </div>
+  </div>
+  <div class="dashboard-mockup reveal" id="dashboard-mockup">
+    <div class="mockup-header"><h3>Service Provider Dashboard</h3></div>
+    <div class="mockup-grid">
+      <div class="mockup-stat"><div class="m-icon">👥</div><div class="m-val" id="dash-clients">—</div><div class="m-label">Total Clients</div></div>
+      <div class="mockup-stat"><div class="m-icon">💰</div><div class="m-val" id="dash-earnings">—</div><div class="m-label">Monthly (EGP)</div></div>
+      <div class="mockup-stat"><div class="m-icon">📋</div><div class="m-val" id="dash-reports">—</div><div class="m-label">Reports Sent</div></div>
+      <div class="mockup-stat"><div class="m-icon">🗓</div><div class="m-val" id="dash-subs">—</div><div class="m-label">Active Subs</div></div>
+    </div>
+    <div class="mockup-actions">
+      <div class="mockup-btn" onclick="openModal('report')">Add New Report</div>
+      <div class="mockup-btn" onclick="loadDashboard()">Refresh</div>
+    </div>
+  </div>
+</section>
+
+<!-- REPORTS -->
+<section class="reports-section" id="reports">
+  <div class="reports-content">
+    <div class="report-mockup reveal">
+      <div class="report-mockup-header"><h4>Add Report</h4><span style="font-size:.8rem;opacity:.7">Reports ▾</span></div>
+      <div class="report-mockup-body">
+        <p style="font-size:.8rem;font-weight:700;color:var(--text-muted);margin-bottom:10px">REPORT TYPE</p>
+        <div class="report-types">
+          <div class="report-type-item active" onclick="setReportType(this,'health')">
+            <div class="rt-icon">❤️</div><div><h5>Health Report</h5><p>Symptoms, behavior & health notes</p></div>
+          </div>
+          <div class="report-type-item" onclick="setReportType(this,'educational')">
+            <div class="rt-icon">🎓</div><div><h5>Educational Report</h5><p>Learning progress & recommendations</p></div>
+          </div>
+          <div class="report-type-item" onclick="setReportType(this,'behavioral')">
+            <div class="rt-icon">🧠</div><div><h5>Behavioral Report</h5><p>Behavior patterns & support notes</p></div>
+          </div>
+        </div>
+        <p style="font-size:.8rem;font-weight:700;color:var(--text-muted);margin-bottom:10px">SEND TO</p>
+        <div class="recipients">
+          <span class="recipient-tag">Parent</span><span class="recipient-tag">Doctor</span>
+          <span class="recipient-tag">Psychologist</span><span class="recipient-tag">Nurse</span><span class="recipient-tag">Trainer</span>
+        </div>
+        <div class="send-btn-wrap"><button class="send-btn" onclick="openModal('report')">Send Report Now</button></div>
+      </div>
+    </div>
+    <div class="reveal">
+      <div class="section-label">Smart Reports</div>
+      <h2 class="section-title">Keep Every Stakeholder<br>in the Loop</h2>
+      <p class="section-desc">Send structured health, educational & behavioral reports with file, image, audio and video attachments.</p>
+      <div class="feature-list">
+        <div class="feature-item"><div class="feature-icon">📎</div><div><h5>Rich Attachments</h5><p>Attach files, images, audio & videos to each report.</p></div></div>
+        <div class="feature-item"><div class="feature-icon">⏰</div><div><h5>Schedule Send</h5><p>Write in advance and schedule delivery at the right time.</p></div></div>
+        <div class="feature-item"><div class="feature-icon">👨‍👩‍👧</div><div><h5>Multi-Recipient</h5><p>Send one report to parents, doctors, psychologists & trainers at once.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+  <div class="section-header centered reveal">
+    <div class="section-label">Reviews</div>
+    <h2 class="section-title">Trusted by Families<br>Across Egypt</h2>
+  </div>
+  <div class="testimonials-grid" id="reviews-grid">
+    <div class="testimonial-card reveal"><div class="t-stars">★★★★★</div><p class="t-text">"Gleam connected us with an amazing shadow teacher for our son. The report system keeps us updated every week."</p><div class="t-author"><div class="t-avatar">R</div><div><h5>Rania Mahmoud</h5><p>Parent · Cairo</p></div></div></div>
+    <div class="testimonial-card reveal"><div class="t-stars">★★★★★</div><p class="t-text">"As a pediatric nurse, Gleam has given me a professional dashboard to manage all my clients. Incredibly organized."</p><div class="t-author"><div class="t-avatar">A</div><div><h5>Ahmed Karim</h5><p>Vaccination Nurse · Alexandria</p></div></div></div>
+    <div class="testimonial-card reveal"><div class="t-stars">★★★★☆</div><p class="t-text">"Finding a football coach who specializes in special needs was impossible before Gleam. Prompt and professional."</p><div class="t-author"><div class="t-avatar">H</div><div><h5>Hana El-Sayed</h5><p>Parent · Giza</p></div></div></div>
+  </div>
+</section>
+
+<!-- SUBSCRIPTIONS -->
+<section class="subscriptions-section" id="subscriptions">
+  <div class="section-header centered reveal">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-title">Simple, Transparent<br>Subscription Plans</h2>
+    <p class="section-desc">Flexible plans for both families and service providers. No hidden fees.</p>
+  </div>
+  <div class="sub-cards">
+    <div class="sub-card reveal"><div class="sub-name">Starter</div><div class="sub-price">350 EGP <span>/month</span></div><p class="sub-desc">Perfect for families getting started with one specialist.</p><div class="sub-features"><div class="sub-feature"><span class="check">✓</span>1 Service Provider</div><div class="sub-feature"><span class="check">✓</span>Monthly Reports</div><div class="sub-feature"><span class="check">✓</span>Basic Support</div></div><button class="sub-btn" onclick="openModal('signup')">Get Started</button></div>
+    <div class="sub-card featured reveal"><div class="sub-badge">POPULAR</div><div class="sub-name">Professional</div><div class="sub-price">8,200 EGP <span>/month</span></div><p class="sub-desc">Full access for providers managing multiple clients.</p><div class="sub-features"><div class="sub-feature"><span class="check">✓</span>Unlimited Clients</div><div class="sub-feature"><span class="check">✓</span>All Report Types</div><div class="sub-feature"><span class="check">✓</span>Rich Attachments</div><div class="sub-feature"><span class="check">✓</span>Schedule Send</div></div><button class="sub-btn" onclick="openModal('signup')">Get Started</button></div>
+    <div class="sub-card reveal"><div class="sub-name">Enterprise</div><div class="sub-price">Custom</div><p class="sub-desc">For clinics, schools & organizations with multiple providers.</p><div class="sub-features"><div class="sub-feature"><span class="check">✓</span>Team Accounts</div><div class="sub-feature"><span class="check">✓</span>Admin Dashboard</div><div class="sub-feature"><span class="check">✓</span>API Access</div></div><button class="sub-btn">Contact Us</button></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-banner">
+  <h2>Ready to Make a Difference?</h2>
+  <p>Join thousands of providers and families on Gleam — Egypt's most trusted children's care platform.</p>
+  <div class="cta-btns">
+    <button class="btn-cta-white" onclick="openModal('signup')">Create Your Account</button>
+    <button class="btn-cta-outline" onclick="openModal('login')">Already Have an Account</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="nav-logo"><div class="paw">🐾</div>Gleam</div>
+      <p>Egypt's leading platform connecting families with verified doctors, nurses, teachers & coaches for children's care.</p>
+    </div>
+    <div class="footer-col"><h5>Services</h5><ul><li><a href="#">Doctors</a></li><li><a href="#">Nurses</a></li><li><a href="#">Teachers</a></li><li><a href="#">Coaches</a></li></ul></div>
+    <div class="footer-col"><h5>Platform</h5><ul><li><a href="#">How It Works</a></li><li><a href="#">Subscriptions</a></li><li><a href="#">Reports</a></li><li><a href="#">Dashboard</a></li></ul></div>
+    <div class="footer-col"><h5>Company</h5><ul><li><a href="#">About Us</a></li><li><a href="#">Careers</a></li><li><a href="#">Privacy Policy</a></li><li><a href="#">Contact</a></li></ul></div>
+  </div>
+  <div class="footer-bottom"><span>© 2025 Gleam. All rights reserved.</span><span>Made with ❤️ for Egypt's children</span></div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-close" onclick="closeModal()">✕</div>
+
+    <!-- Sign Up -->
+    <div class="modal-step active" id="step-account">
+      <h2>Create Account</h2>
+      <p class="sub-text">Sign up to continue</p>
+      <div id="signup-alert" class="alert"></div>
+      <div class="form-group"><label>Email Address</label><input type="email" id="reg-email" placeholder="your@email.com"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="reg-pass" placeholder="Min 6 characters"></div>
+      <div class="form-group"><label>Confirm Password</label><input type="password" id="reg-pass2" placeholder="Repeat password"></div>
+      <div class="form-group"><label>I am a</label>
+        <select id="reg-role"><option value="provider">Service Provider (Doctor / Nurse / Teacher / Coach)</option><option value="parent">Parent</option></select>
+      </div>
+      <div class="form-check"><input type="checkbox" id="agree"><label for="agree">I agree with the <a href="#">privacy policy</a></label></div>
+      <button class="btn-submit" id="btn-register" onclick="doRegister()">Sign Up</button>
+      <p style="text-align:center;margin-top:14px;font-size:.85rem;color:var(--text-muted)">Already have an account? <a href="#" onclick="openModal('login')" style="color:var(--green-main);font-weight:600">Login</a></p>
+    </div>
+
+    <!-- Choose Job (provider only) -->
+    <div class="modal-step" id="step-job">
+      <h2>Choose Your Job</h2>
+      <p class="sub-text">What service do you provide?</p>
+      <div class="job-list">
+        <div class="job-item" onclick="selectJob(this,'doctor')"><div class="j-icon">🩺</div><div><h4>Doctor</h4><p>Pediatric doctors & specialists</p></div></div>
+        <div class="job-item" onclick="selectJob(this,'nurse')"><div class="j-icon">💉</div><div><h4>Nurse</h4><p>Vaccination & home child care nurses</p></div></div>
+        <div class="job-item" onclick="selectJob(this,'teacher')"><div class="j-icon">📚</div><div><h4>Teacher</h4><p>Learning support & special needs teachers</p></div></div>
+        <div class="job-item" onclick="selectJob(this,'coach')"><div class="j-icon">⚽</div><div><h4>Coach</h4><p>Kids sports & special needs coaches</p></div></div>
+      </div>
+      <button class="btn-submit" onclick="goToStep('step-success')">Continue</button>
+    </div>
+
+    <!-- Success -->
+    <div class="modal-step" id="step-success" style="text-align:center;padding:20px 0">
+      <div style="font-size:4rem;margin-bottom:16px">🎈</div>
+      <h2>Account Created!</h2>
+      <p class="sub-text">Welcome to Gleam. Your account has been created <span style="color:var(--green-main);font-weight:700">Successfully!</span></p>
+      <button class="btn-submit" style="margin-top:28px" onclick="closeModal()">Continue</button>
+    </div>
+
+    <!-- Login -->
+    <div class="modal-step" id="step-login">
+      <h2>Welcome Back</h2>
+      <p class="sub-text">Login to your Gleam account</p>
+      <div id="login-alert" class="alert"></div>
+      <div class="form-group"><label>Email Address</label><input type="email" id="login-email" placeholder="your@email.com"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="login-pass" placeholder="Your password"></div>
+      <button class="btn-submit" id="btn-login" onclick="doLogin()">Login</button>
+      <p style="text-align:center;margin-top:14px;font-size:.85rem;color:var(--text-muted)">Don't have an account? <a href="#" onclick="openModal('signup')" style="color:var(--green-main);font-weight:600">Sign Up</a></p>
+    </div>
+
+    <!-- Add Report (logged-in providers) -->
+    <div class="modal-step" id="step-report">
+      <h2>Add Report</h2>
+      <p class="sub-text">Send a report to the child's care team</p>
+      <div id="report-alert" class="alert"></div>
+      <div class="form-group"><label>Child ID</label><input type="number" id="rpt-child" placeholder="Enter child ID"></div>
+      <div class="form-group"><label>Report Type</label>
+        <select id="rpt-type"><option value="health">Health Report</option><option value="educational">Educational Report</option><option value="behavioral">Behavioral Report</option></select>
+      </div>
+      <div class="form-group"><label>Symptoms / Observations</label><input type="text" id="rpt-symptoms" placeholder="Describe symptoms..."></div>
+      <div class="form-group"><label>Notes</label><input type="text" id="rpt-notes" placeholder="Additional notes..."></div>
+      <div class="form-group"><label>Recommendations</label><input type="text" id="rpt-recs" placeholder="Recommendations..."></div>
+      <button class="btn-submit" id="btn-report" onclick="doSendReport()">Send Report Now</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// API CONFIG — change to match your server
+// ═══════════════════════════════════════════
+const API = {
+  base: 'http://localhost/gleam/api',   // ← update this to your server path
+  auth:     '/auth.php',
+  providers:'/providers.php',
+  dashboard:'/dashboard.php',
+  reports:  '/reports.php',
+  reviews:  '/reviews.php',
+  profile:  '/profile.php',
+  subs:     '/subscriptions.php',
+};
+
+// ── State ──────────────────────────────────
+let authToken = localStorage.getItem('gleam_token') || null;
+let authUser  = JSON.parse(localStorage.getItem('gleam_user') || 'null');
+let selectedJob = '';
+let selectedReportType = 'health';
+
+// ── Helpers ────────────────────────────────
+async function api(endpoint, method = 'GET', body = null) {
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+  };
+  if (authToken) opts.headers['Authorization'] = `Bearer ${authToken}`;
+  if (body) opts.body = JSON.stringify(body);
+  try {
+    const res = await fetch(API.base + endpoint, opts);
+    return await res.json();
+  } catch(e) {
+    return { error: 'Network error — is the PHP server running?' };
+  }
+}
+
+function showAlert(id, msg, type = 'error') {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.className = `alert ${type}`; el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 5000);
+}
+
+function setBtn(id, loading) {
+  const btn = document.getElementById(id);
+  btn.disabled = loading;
+  btn.innerHTML = loading ? '<span class="spinner"></span> Please wait…' : btn.dataset.label || btn.innerHTML;
+  if (!btn.dataset.label && !loading) btn.dataset.label = '';
+}
+
+// ── Auth ───────────────────────────────────
+function saveAuth(token, role, userId) {
+  authToken = token; authUser = { role, userId };
+  localStorage.setItem('gleam_token', token);
+  localStorage.setItem('gleam_user', JSON.stringify(authUser));
+  updateNavUI();
+}
+
+function logout() {
+  authToken = null; authUser = null;
+  localStorage.removeItem('gleam_token'); localStorage.removeItem('gleam_user');
+  updateNavUI();
+}
+
+function updateNavUI() {
+  const area = document.getElementById('nav-user-area');
+  if (authUser) {
+    area.innerHTML = `
+      <div class="user-chip"><div class="dot"></div>${authUser.role}</div>
+      <button class="btn-outline" onclick="logout()">Log Out</button>`;
+    loadDashboard();
+  } else {
+    area.innerHTML = `
+      <button class="btn-outline" onclick="openModal('login')">Login</button>
+      <button class="btn-solid"  onclick="openModal('signup')">Sign Up</button>`;
+  }
+}
+
+async function doRegister() {
+  const email = document.getElementById('reg-email').value.trim();
+  const pass  = document.getElementById('reg-pass').value;
+  const pass2 = document.getElementById('reg-pass2').value;
+  const role  = document.getElementById('reg-role').value;
+  if (!email || !pass) return showAlert('signup-alert','Email and password are required');
+  if (pass !== pass2)  return showAlert('signup-alert','Passwords do not match');
+  if (!document.getElementById('agree').checked) return showAlert('signup-alert','Please agree to the privacy policy');
+
+  setBtn('btn-register', true);
+  const data = await api(`${API.auth}?action=register`, 'POST', { email, password: pass, role });
+  setBtn('btn-register', false);
+
+  if (data.error) return showAlert('signup-alert', data.error);
+  saveAuth(data.token, data.role, data.user_id);
+  if (role === 'provider') goToStep('step-job');
+  else goToStep('step-success');
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  if (!email || !pass) return showAlert('login-alert','Email and password are required');
+
+  setBtn('btn-login', true);
+  const data = await api(`${API.auth}?action=login`, 'POST', { email, password: pass });
+  setBtn('btn-login', false);
+
+  if (data.error) return showAlert('login-alert', data.error);
+  saveAuth(data.token, data.role, data.user_id);
+  showAlert('login-alert','Logged in successfully!','success');
+  setTimeout(() => closeModal(), 800);
+}
+
+// ── Providers list ─────────────────────────
+async function loadProviders(job = '') {
+  const grid = document.getElementById('providers-grid');
+  grid.innerHTML = `<div class="loading-row" style="grid-column:span 3"><span class="spinner"></span>Loading providers…</div>`;
+  const qs = job ? `?job=${job}` : '';
+  const data = await api(API.providers + qs);
+  if (data.error || !data.providers?.length) {
+    grid.innerHTML = `<div class="loading-row" style="grid-column:span 3">
+      ${data.error ? '⚠️ ' + data.error : 'No providers found.'}
+    </div>`; return;
+  }
+  grid.innerHTML = data.providers.map(p => {
+    const jobs  = (p.jobs || '').split(',').filter(Boolean);
+    const tags  = jobs.map(j => `<span class="tag">${j}</span>`).join('');
+    const init  = (p.full_name || '?')[0].toUpperCase();
+    const photo = p.profile_photo
+      ? `<img src="${p.profile_photo}" alt="${p.full_name}">`
+      : init;
+    const stars = '★'.repeat(Math.round(p.rating || 0)) + '☆'.repeat(5 - Math.round(p.rating || 0));
+    const price = p.session_price
+      ? `<div class="price">${Number(p.session_price).toLocaleString()} EGP <span>/session</span></div>`
+      : p.monthly_subscription_price
+        ? `<div class="price">${Number(p.monthly_subscription_price).toLocaleString()} EGP <span>/month</span></div>`
+        : `<div class="price">—</div>`;
+    return `
+      <div class="provider-card">
+        <div class="provider-top">
+          <div class="provider-avatar">${photo}</div>
+          <div class="provider-info">
+            <h4>${p.full_name}</h4>
+            <div class="role">${jobs.join(' · ')}</div>
+          </div>
+        </div>
+        <div class="provider-rating">
+          <span class="stars">${stars}</span>
+          <span>${Number(p.rating||0).toFixed(1)} (${p.total_reviews||0} reviews)</span>
+        </div>
+        <div class="provider-tags">${tags}</div>
+        <div class="provider-price">
+          ${price}
+          <button class="btn-book" onclick="bookProvider(${p.id})">Book Now</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function filterProviders(job) {
+  document.getElementById('providers').scrollIntoView({behavior:'smooth'});
+  loadProviders(job);
+}
+
+function bookProvider(id) {
+  if (!authToken) { openModal('login'); return; }
+  alert(`Booking flow for provider #${id} — connect to your booking API here.`);
+}
+
+// ── Dashboard ──────────────────────────────
+async function loadDashboard() {
+  if (!authToken || authUser?.role !== 'provider') return;
+  const data = await api(API.dashboard);
+  if (data.error || !data.stats) return;
+  const s = data.stats;
+  document.getElementById('dash-clients').textContent  = s.total_clients;
+  document.getElementById('dash-earnings').textContent = Number(s.monthly_earnings).toLocaleString();
+  document.getElementById('dash-reports').textContent  = s.reports_sent;
+  document.getElementById('dash-subs').textContent     = s.active_subscriptions;
+}
+
+// ── Reports ────────────────────────────────
+async function doSendReport() {
+  if (!authToken) return showAlert('report-alert','Please log in first');
+  const child = document.getElementById('rpt-child').value;
+  const type  = document.getElementById('rpt-type').value;
+  if (!child) return showAlert('report-alert','Child ID is required');
+
+  setBtn('btn-report', true);
+  const data = await api(`${API.reports}?action=create`, 'POST', {
+    child_id:        parseInt(child),
+    report_type:     type,
+    symptoms:        document.getElementById('rpt-symptoms').value,
+    notes:           document.getElementById('rpt-notes').value,
+    recommendations: document.getElementById('rpt-recs').value,
+    recipients:      ['parent','doctor','psychologist','nurse','trainer'],
+  });
+  setBtn('btn-report', false);
+  if (data.error) return showAlert('report-alert', data.error);
+  showAlert('report-alert','Report sent successfully!','success');
+  setTimeout(() => closeModal(), 1200);
+}
+
+// ── Modal helpers ──────────────────────────
+function openModal(mode) {
+  document.querySelectorAll('.modal-step').forEach(s => s.classList.remove('active'));
+  const map = { signup:'step-account', login:'step-login', report:'step-report' };
+  document.getElementById(map[mode] || 'step-account').classList.add('active');
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function goToStep(id) {
+  document.querySelectorAll('.modal-step').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function selectJob(el, job) {
+  document.querySelectorAll('.job-item').forEach(j => j.classList.remove('selected'));
+  el.classList.add('selected'); selectedJob = job;
+}
+function setReportType(el, type) {
+  document.querySelectorAll('.report-type-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active'); selectedReportType = type;
+  const sel = document.getElementById('rpt-type');
+  if (sel) sel.value = type;
+}
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ── Scroll ─────────────────────────────────
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+});
+const observer = new IntersectionObserver(entries =>
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); })
+, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(r => observer.observe(r));
+
+// ── Boot ───────────────────────────────────
+updateNavUI();
+loadProviders();
+</script>
+</body>
+</html>
